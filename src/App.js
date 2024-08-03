@@ -1,26 +1,5 @@
-// // src/App.js
-// import React from 'react';
-// import Form from './Form';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <h1>Employee Details Form</h1>
-//       </header>
-//       <Form />
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
-
-
 import React, { useState } from 'react';
-import { Container, Typography, Button, Modal, Box } from '@mui/material';
+import { Container, Typography, Button, Modal, Box, Snackbar } from '@mui/material';
 import EmployeeTable from './components/EmployeeTable';
 import EmployeeForm from './components/EmployeeForm';
 
@@ -28,15 +7,24 @@ const App = () => {
   const [employees, setEmployees] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  const showNotification = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
 
   const handleAdd = (newEmployee) => {
     setEmployees([...employees, newEmployee]);
     setIsModalOpen(false);
+    showNotification('Employee added successfully');
   };
 
   const handleEdit = (updatedEmployee) => {
     setEmployees(employees.map((employee) => (employee.id === updatedEmployee.id ? updatedEmployee : employee)));
     setIsModalOpen(false);
+    showNotification('Employee updated successfully');
   };
 
   const handleDelete = (id) => {
@@ -53,6 +41,10 @@ const App = () => {
     setCurrentEmployee(null);
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
@@ -61,7 +53,7 @@ const App = () => {
       <Button variant="contained" color="primary" onClick={() => openModal()}>
         Add Employee
       </Button>
-      <EmployeeTable employees={employees} onEdit={openModal} onDelete={handleDelete} />
+      <EmployeeTable employees={employees} onEdit={openModal} onDelete={handleDelete} showNotification={showNotification} />
       <Modal open={isModalOpen} onClose={closeModal}>
         <Box sx={{ p: 4, backgroundColor: 'white', margin: 'auto', marginTop: '10%', maxWidth: '500px' }}>
           <EmployeeForm
@@ -71,6 +63,12 @@ const App = () => {
           />
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+      />
     </Container>
   );
 };
